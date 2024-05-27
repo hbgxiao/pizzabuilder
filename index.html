@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Build a Pizza!</title>
+        <style>
+          body {
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5px;
+          }
+          b {
+            color: red;
+          }
+          button {
+            color: black;
+            font-family: monospace;
+          }
+          canvas {
+            display: block;
+            margin: 20px auto;
+          }
+          .column1 {
+            float: left;
+            width: 24%;
+            padding: 5px;
+            height: 300px;
+          }
+          .column2 {
+            float: left;
+            width: 48%;
+            padding: 5px;
+            height: 300px;
+          }
+          ul {
+            list-style-type: none;
+            padding: 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Let's build a <b>Pizza</b>!</h1>
+          <div class="row">
+            <div class="column1">
+              <h2>Select toppings</h2>
+              <ul>
+                <li>
+                  <input type="checkbox" id="cheese" name="topping" value="cheese">
+                  <label for="cheese">Cheese</label>
+                  <select id="cheese-amount">
+                    <option value="0">None</option>
+                    <option value="1">Eighth</option>
+                    <option value="2">Quarter</option>
+                    <option value="4">Half</option>
+                    <option value="8">Whole</option>
+                  </select>
+                </li>
+                &nbsp;
+                <li>
+                  <input type="checkbox" id="pepperoni" name="topping" value="pepperoni">
+                  <label for="pepperoni">Pepperoni</label>
+                  <select id="pepperoni-amount">
+                    <option value="0">None</option>
+                    <option value="1">Eighth</option>
+                    <option value="2">Quarter</option>
+                    <option value="4">Half</option>
+                    <option value="8">Whole</option>
+                  </select>
+                </li>
+                &nbsp;
+                <li>
+                  <input type="checkbox" id="sausage" name="topping" value="sausage">
+                  <label for="sausage">Sausage</label>
+                  <select id="sausage-amount">
+                    <option value="0">None</option>
+                    <option value="1">Eighth</option>
+                    <option value="2">Quarter</option>
+                    <option value="4">Half</option>
+                    <option value="8">Whole</option>
+                  </select>
+                </li>
+                &nbsp;
+                <li>
+                  <input type="checkbox" id="peppers" name="topping" value="peppers">
+                  <label for="peppers">Peppers</label>
+                  <select id="peppers-amount">
+                    <option value="0">None</option>
+                    <option value="1">Eighth</option>
+                    <option value="2">Quarter</option>
+                    <option value="4">Half</option>
+                    <option value="8">Whole</option>
+                  </select>
+                </li>
+                &nbsp;
+                <li>
+                  <input type="checkbox" id="mushrooms" name="topping" value="mushrooms">
+                  <label for="mushrooms">Mushrooms</label>
+                  <select id="mushrooms-amount">
+                    <option value="0">None</option>
+                    <option value="1">Eighth</option>
+                    <option value="2">Quarter</option>
+                    <option value="4">Half</option>
+                    <option value="8">Whole</option>
+                  </select>
+                </li>
+              </ul>
+            </div>
+            <div class="column1">
+              <h2>Let's add to your pizza!</h2>
+              <ul>
+                <li><button onclick="buildPizza()">Build Pizza</button></li>
+                &nbsp;
+                <li><button onclick="clearPizza()">Clear Pizza</button></li>
+              </ul>
+            </div>
+          </div>
+          <div class="column2">
+            <canvas id="pizzaCanvas" width="450" height="450"></canvas>
+          </div>
+        </div>
+      </body>
+
+    <script>
+        const canvas = document.getElementById('pizzaCanvas');
+        const ctx = canvas.getContext('2d');
+    
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // toppings array!!
+        let toppings = new Array(8).fill(null);
+    
+        function drawPizza() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 190, 0, 2 * Math.PI, false);
+            ctx.fillStyle = 'yellow';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'brown';
+            ctx.stroke();
+            ctx.closePath();
+    
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 175, 0, 2 * Math.PI, false);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath();
+    
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'white';
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                const angle = (i * Math.PI) / 4;
+                ctx.lineTo(centerX + 190 * Math.cos(angle), centerY + 190 * Math.sin(angle));
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+    
+        function buildPizza() {
+            toppings = new Array(8).fill(null);
+    
+            let index = 0;
+
+            // get the selected toppings
+            const toppingInputs = document.querySelectorAll('input[name="topping"]:checked');
+    
+            // get amount of each topping and fill array as such
+            toppingInputs.forEach(input => {
+                const topping = input.value;
+                const amount = parseInt(document.getElementById(`${topping}-amount`).value);
+                for (let i = 0; i < amount; i++) {
+                    if (index < 8) {
+                        toppings[index] = topping;
+                        index++;
+                    }
+                }
+            });
+    
+            console.log('Toppings array:', toppings);
+    
+            drawPizza();
+    
+            // one-to-one mapping of topping to pizza
+            for (let i = 0; i < 8; i++) {
+                if (toppings[i] !== null) {
+                    addTopping(toppings[i], i);
+                }
+            }
+        }
+    
+        function addTopping(topping, segment) {
+            let color, shape, quantity;
+    
+            switch (topping) {
+                case 'cheese':
+                    color = 'yellow';
+                    shape = 'rectangle';
+                    break;
+                case 'pepperoni':
+                    color = 'darkred';
+                    shape = 'circle';
+                    break;
+                case 'sausage':
+                    color = 'brown';
+                    shape = 'circle';
+                    break;
+                case 'peppers':
+                    color = 'green';
+                    shape = 'rectangle';
+                    break;
+                case 'mushrooms':
+                    color = 'brown';
+                    shape = 'crescent';
+                    break;
+                default:
+                    return;
+            }
+    
+            quantity = 20;
+    
+            if (topping === 'cheese' || topping === 'peppers') {
+                quantity *= 2;
+            }
+    
+            let startAngle = segment * Math.PI / 4 - Math.PI / 2;
+            let endAngle = (segment + 1) * Math.PI / 4 - Math.PI / 2;
+    
+            for (let i = 0; i < quantity; i++) {
+                let angle, radius, x, y;
+    
+                angle = Math.random() * (endAngle - startAngle) + startAngle;
+                radius = Math.random() * 170; 
+    
+                x = centerX + radius * Math.cos(angle);
+                y = centerY + radius * Math.sin(angle);
+    
+                ctx.fillStyle = color;
+    
+                ctx.beginPath();
+                if (shape === 'circle') {
+                    ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+                } else if (shape === 'rectangle') {
+                    ctx.rect(x, y, 10, 5); 
+                } else if (shape === 'crescent') {
+                    ctx.arc(x, y, 10, Math.PI / 4, Math.PI * 1.25);
+                }
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+    
+        function clearPizza() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            drawPizza();
+    
+            toppings = new Array(8).fill(null);
+    
+            const toppingInputs = document.querySelectorAll('input[name="topping"]');
+    
+            toppingInputs.forEach(input => {
+                input.checked = false;
+                document.getElementById(`${input.value}-amount`).value = '0';
+            });
+    
+            console.log('Toppings array:', toppings);
+        }
+    
+        drawPizza();
+    </script>
+    </body>
+    </html>
